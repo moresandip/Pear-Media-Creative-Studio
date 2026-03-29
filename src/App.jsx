@@ -30,27 +30,43 @@ function App() {
   }
 
   const handleEnhance = async () => {
-    if (!userPrompt || !geminiKey) return
+    if (!userPrompt) {
+      alert('Please enter a prompt to enhance.')
+      return
+    }
+    if (!geminiKey) {
+      alert('Gemini API key is missing. Please add it in Settings.')
+      setShowSettings(true)
+      return
+    }
     setIsEnhancing(true)
     try {
       const enhanced = await enhancePrompt(userPrompt, geminiKey)
       setEnhancedPrompt(enhanced)
     } catch (error) {
-      alert('Enhancement failed. Check your API key.')
+      const errorMsg = error.response?.data?.error?.message || error.message || 'Unknown error'
+      alert(`Enhancement failed: ${errorMsg}`)
+      console.error('Enhancement error:', error)
     } finally {
       setIsEnhancing(false)
     }
   }
 
   const handleGenerate = async (prompt) => {
-    if (!hfKey) return
+    if (!prompt) return
+    if (!hfKey) {
+      alert('Hugging Face API key is missing. Please add it in Settings.')
+      setShowSettings(true)
+      return
+    }
     setIsGenerating(true)
     try {
       const imgUrl = await generateImage(prompt, hfKey)
       if (activeTab === 'text') setGeneratedImage(imgUrl)
       else setVariationImage(imgUrl)
     } catch (error) {
-      alert('Generation failed. Check your Hugging Face API key.')
+      alert(`Generation failed: ${error.message}`)
+      console.error('Generation error:', error)
     } finally {
       setIsGenerating(false)
     }
@@ -70,13 +86,23 @@ function App() {
   }
 
   const handleAnalyze = async () => {
-    if (!uploadedImageBase64 || !geminiKey) return
+    if (!uploadedImageBase64) {
+      alert('Please upload an image first.')
+      return
+    }
+    if (!geminiKey) {
+      alert('Gemini API key is missing. Please add it in Settings.')
+      setShowSettings(true)
+      return
+    }
     setIsAnalyzing(true)
     try {
       const analysis = await analyzeImage(uploadedImageBase64, geminiKey)
       setImageAnalysis(analysis)
     } catch (error) {
-      alert('Analysis failed. Check your Gemini API key.')
+      const errorMsg = error.response?.data?.error?.message || error.message || 'Unknown error'
+      alert(`Analysis failed: ${errorMsg}`)
+      console.error('Analysis error:', error)
     } finally {
       setIsAnalyzing(false)
     }
