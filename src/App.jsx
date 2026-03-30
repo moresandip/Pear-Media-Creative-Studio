@@ -9,6 +9,14 @@ function App() {
   const [hfKey, setHfKey] = useState(localStorage.getItem('hf_api_key') || import.meta.env.VITE_HF_API_KEY || '')
   const [showSettings, setShowSettings] = useState(false)
   
+  // Debug logging
+  useEffect(() => {
+    console.log('Gemini Key loaded:', geminiKey ? 'Yes (hidden)' : 'No')
+    console.log('HF Key loaded:', hfKey ? 'Yes (hidden)' : 'No')
+    console.log('Env Gemini:', import.meta.env.VITE_GEMINI_API_KEY ? 'Yes' : 'No')
+    console.log('Env HF:', import.meta.env.VITE_HF_API_KEY ? 'Yes' : 'No')
+  }, [])
+  
   // Text Workflow State
   const [userPrompt, setUserPrompt] = useState('')
   const [enhancedPrompt, setEnhancedPrompt] = useState('')
@@ -30,6 +38,8 @@ function App() {
   }
 
   const handleEnhance = async () => {
+    console.log('Enhance clicked. Prompt:', userPrompt)
+    console.log('Gemini key present:', !!geminiKey)
     if (!userPrompt) {
       alert('Please enter a prompt to enhance.')
       return
@@ -40,13 +50,16 @@ function App() {
       return
     }
     setIsEnhancing(true)
+    console.log('Calling enhancePrompt...')
     try {
       const enhanced = await enhancePrompt(userPrompt, geminiKey)
+      console.log('Enhancement success:', enhanced)
       setEnhancedPrompt(enhanced)
     } catch (error) {
+      console.error('Full error object:', error)
+      console.error('Error response:', error.response)
       const errorMsg = error.response?.data?.error?.message || error.message || 'Unknown error'
       alert(`Enhancement failed: ${errorMsg}`)
-      console.error('Enhancement error:', error)
     } finally {
       setIsEnhancing(false)
     }
